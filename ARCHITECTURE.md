@@ -79,12 +79,73 @@ table (or outbox), not more columns on `url_mapping`.
 
 ## How AI was used
 
-Used AI for scaffolding, first-pass implementations, test stubs, and doc
-cleanup. I still decided scope, architecture, and what shipped.
+I treated AI as a sparring partner and a build accelerator, not as the architect.
+Design came first from me; implementation went through AI in small phases I could
+still own and roll back.
 
-Pattern was: write down what "done" means → let AI draft → run tests / hit the
-API → keep, edit, or throw away. Anything security-related or schema-related got
-an extra pass; nothing like that went in on AI say-so alone.
+### Design first, then argue with the model
+
+I started on system design myself — gateway vs app responsibilities, why multiple
+instances, why the database has to scale out at all, what a short code even is.
+Only after I had a stance did I put it in front of AI and ask it to push back:
+does sharding actually belong here, what should the shard key be, why encode the
+shard into the short code instead of a lookup table, what falls over if you get
+that wrong. Same pattern for application design: I sketched controllers, cache
+placement, async analytics, then made the model debate those choices until the
+trade-offs felt honest enough to write down.
+
+That order mattered. If I had asked AI to "design a URL shortener" first, I would
+have been reviewing a generic answer. By bringing my own decisions in and fighting
+for them, I kept ownership of the architecture and used AI to stress-test it.
+
+### Build in small green commits
+
+For the technical build-out I did use AI heavily — scaffolding, wiring, first-pass
+service and controller code, tests, Docker, docs polish. Not as one giant
+generation. As a sequence of slices that match the commit history:
+
+1. Spring Boot scaffold  
+2. Config, datasource, error envelope  
+3. Domain, Flyway, repository  
+4. Shorten / redirect / cache / async analytics as one vertical slice  
+5. Cache fix when the first version was wrong  
+6. Security, correlation ids, API docs  
+7. Logging and metrics verification  
+8. Docker + remaining docs  
+
+Each phase had a clear "done": app still boots, relevant tests pass, and the
+diff is small enough that I could actually read what was about to land. I
+reviewed every commit's git diff myself before moving on. If something looked
+off, I fixed it in that phase or rolled back — I did not stack untested AI output
+and hope the next step would clean it up.
+
+That is also why the history has a dedicated cache fix commit. The first cut was
+not correct; tests and a real look at the call path caught it; the fix is its own
+change so the mistake and the correction are both visible.
+
+### What AI was good at vs what I kept
+
+| AI helped with | I kept ownership of |
+|---|---|
+| Boilerplate and Spring wiring | System and application design choices |
+| First-pass implementations per phase | Whether a phase was actually done |
+| Test stubs and expanding cases | What correctness means for that slice |
+| Drafting / tightening docs | Final wording and what we claim is built |
+| Suggesting alternatives in design debates | The decision after the debate |
+
+Examples of not taking AI at face value: the cache path had to be reworked after
+self-invocation / wrong layering showed up; Caffeine's `cache_puts_total` and
+`cache_size` look useful until you scrape a live process and see they do not
+mean what you hoped — that only showed up when I verified metrics against a
+running instance, not when the code was first generated.
+
+### Traceability in practice
+
+I did not keep a separate "AI change log" file. Traceability for this project is
+the commit history plus green tests at each step: each commit is a reviewable
+unit, the app was working after each one, and anything high impact (security,
+schema, cache behavior, Docker networking) only stayed if it survived that gate.
+AI proposed a lot of the text inside those commits; I approved what shipped.
 
 ## Testing
 

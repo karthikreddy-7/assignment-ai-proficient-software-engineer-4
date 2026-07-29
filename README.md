@@ -7,7 +7,7 @@ URL, get redirected when you hit the short link, see basic click stats.
 |---|---|
 | [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md) | How this would scale (gateway, instances, sharding) — not fully built |
 | [APPLICATION_DESIGN.md](APPLICATION_DESIGN.md) | What's actually built (controllers, services, cache, db) |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Scenarios, testing approach, observability, summary |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Scenarios, testing, observability, summary, and **how AI was used** (design debates + iterative green commits) |
 | [DEMO.md](DEMO.md) | Request + metrics captures from a Docker smoke run |
 
 ![System design](images/system-design.png)
