@@ -8,8 +8,9 @@ sharded Postgres setup underneath.
 
 What's actually running right now is one instance against one database — no gateway,
 no sharding. This is the direction I'd take it in if I needed to scale it, and the
-reasoning behind each piece of it is below. The application-level design (what's
-actually built) is a separate write-up.
+reasoning behind each piece of it is below. The application-level design — what's
+actually built, controllers/services/cache/db — is a separate write-up:
+[APPLICATION_DESIGN.md](APPLICATION_DESIGN.md).
 
 ## Why an API gateway
 
@@ -70,7 +71,7 @@ its code decodes to.
 
 ## What's not built yet
 
-- Application-level design (controllers, services, cache, DB) — separate write-up,
-  in progress.
 - Everything above this line — gateway, multiple instances, sharding. What's actually
-  running is a single instance, single database.
+  running is a single instance, single database. See
+  [APPLICATION_DESIGN.md](APPLICATION_DESIGN.md) for what that single instance actually
+  looks like.

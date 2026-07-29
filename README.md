@@ -3,11 +3,16 @@
 A URL shortener built for the AI-Proficient Software Engineer take-home. Shorten a
 URL, get redirected when you hit the short link, see basic click stats.
 
-Full reasoning behind the design choices is in [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md).
-The three required scenarios (greenfield / brownfield / ambiguous), testing approach,
-and final summary are in [ARCHITECTURE.md](ARCHITECTURE.md).
+Full reasoning behind the design choices is in [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md)
+(how this would scale — gateway, instances, sharding) and
+[APPLICATION_DESIGN.md](APPLICATION_DESIGN.md) (what's actually built — controllers,
+services, cache, db). The three required scenarios (greenfield / brownfield /
+ambiguous), testing approach, and final summary are in
+[ARCHITECTURE.md](ARCHITECTURE.md).
 
 ![System design](images/system-design.png)
+
+![Application design](images/application-design.png)
 
 ## Stack
 
