@@ -15,5 +15,26 @@ services:
       timeout: 5s
       retries: 10
 
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      # Hostname is the compose service name — not localhost.
+      DB_URL: jdbc:postgresql://postgres:5432/urlshortener
+      DB_USERNAME: urlshortener
+      DB_PASSWORD: urlshortener
+      # Override for anything beyond local demos; default matches application.properties.
+      API_KEY: ${API_KEY:-testing}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health | grep -q UP || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+
 volumes:
   urlshortener-postgres-data:

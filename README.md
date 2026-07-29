@@ -6,9 +6,9 @@ URL, get redirected when you hit the short link, see basic click stats.
 Full reasoning behind the design choices is in [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md)
 (how this would scale — gateway, instances, sharding) and
 [APPLICATION_DESIGN.md](APPLICATION_DESIGN.md) (what's actually built — controllers,
-services, cache, db). The three required scenarios (greenfield / brownfield /
-ambiguous), testing approach, and final summary are in
-[ARCHITECTURE.md](ARCHITECTURE.md).
+services, cache, db). Scenarios, testing, and summary are in
+[ARCHITECTURE.md](ARCHITECTURE.md). Request + metrics captures from a Docker smoke
+run are in [DEMO.md](DEMO.md).
 
 ![System design](images/system-design.png)
 
@@ -20,14 +20,36 @@ Java 21, Spring Boot, Postgres, Maven.
 
 ## Running it
 
+### Full stack (app + Postgres) via Docker
+
 ```
 cd urlshortener
-docker compose up -d
+docker compose up --build -d
+```
+
+That builds the app image, starts Postgres, waits for it to be healthy, then starts
+the app. Both containers come up together; the app talks to Postgres over the
+compose network (`jdbc:postgresql://postgres:5432/urlshortener`).
+
+App: `http://localhost:8080` — health at `/actuator/health`, API docs at
+`/swagger-ui.html`, Prometheus metrics at `/actuator/prometheus`.
+
+Stop and remove containers (keeps the Postgres volume):
+
+```
+docker compose down
+```
+
+### Local app against Dockerized Postgres only
+
+```
+cd urlshortener
+docker compose up -d postgres
 ./mvnw spring-boot:run
 ```
 
-App comes up on `localhost:8080`. Health check at `/actuator/health`, API docs at
-`/swagger-ui.html`.
+Defaults in `application.properties` already point at `localhost:5432` with the
+same credentials compose uses, so no extra config is needed for local runs.
 
 ## API
 

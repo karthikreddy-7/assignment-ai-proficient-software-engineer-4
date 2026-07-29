@@ -71,3 +71,9 @@ Things like the correlation-id filter that stamps a trace ID onto every request 
 logging, and the exact error-response shape, are real but left off this diagram on
 purpose — the diagram is about how a request moves through the pieces, not every filter
 in the chain.
+
+## Seeing it work
+
+[DEMO.md](DEMO.md) walks through three live captures from the Docker stack: create a
+short URL, hit the redirect, then read click stats — each one next to the metrics that
+moved on `/actuator/prometheus`. The images themselves sit under `examples/`.
