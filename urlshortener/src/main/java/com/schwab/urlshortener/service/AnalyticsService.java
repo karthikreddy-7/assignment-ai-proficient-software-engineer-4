@@ -23,11 +23,11 @@ public class AnalyticsService {
     @Async(AsyncConfig.ANALYTICS_EXECUTOR)
     @Transactional
     public void recordClickAsync(String code) {
+        log.info("code={} click received, recording asynchronously on {}", code, Thread.currentThread().getName());
         int updated = repository.incrementClickCount(code, Instant.now());
+        log.info("code={} repository update count={}", code, updated);
         if (updated == 0) {
             log.warn("Click for code={} not recorded - code no longer exists", code);
-        } else {
-            log.debug("Recorded click for code={}", code);
         }
     }
 }

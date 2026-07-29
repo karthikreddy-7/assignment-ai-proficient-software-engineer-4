@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 
 import java.lang.reflect.Field;
 import java.time.Instant;
@@ -38,7 +39,7 @@ class UrlServiceTest {
 
     @BeforeEach
     void wireRealCollaborators() {
-        UrlLookupCache urlLookupCache = new UrlLookupCache(repository);
+        UrlLookupCache urlLookupCache = new UrlLookupCache(repository, new ConcurrentMapCacheManager());
         urlService = new UrlService(repository, urlSafetyValidator, codeGenerator, analyticsService, urlLookupCache);
     }
 
