@@ -38,7 +38,8 @@ class UrlServiceTest {
 
     @BeforeEach
     void wireRealCollaborators() {
-        urlService = new UrlService(repository, urlSafetyValidator, codeGenerator, analyticsService);
+        UrlLookupCache urlLookupCache = new UrlLookupCache(repository);
+        urlService = new UrlService(repository, urlSafetyValidator, codeGenerator, analyticsService, urlLookupCache);
     }
 
     @Test

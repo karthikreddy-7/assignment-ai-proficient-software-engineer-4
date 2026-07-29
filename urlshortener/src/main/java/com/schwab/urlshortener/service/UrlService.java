@@ -8,7 +8,6 @@ import com.schwab.urlshortener.repository.UrlMappingRepository;
 import com.schwab.urlshortener.validation.UrlSafetyValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,13 +21,16 @@ public class UrlService {
     private final UrlSafetyValidator urlSafetyValidator;
     private final CodeGenerator codeGenerator;
     private final AnalyticsService analyticsService;
+    private final UrlLookupCache urlLookupCache;
 
     public UrlService(UrlMappingRepository repository, UrlSafetyValidator urlSafetyValidator,
-                       CodeGenerator codeGenerator, AnalyticsService analyticsService) {
+                       CodeGenerator codeGenerator, AnalyticsService analyticsService,
+                       UrlLookupCache urlLookupCache) {
         this.repository = repository;
         this.urlSafetyValidator = urlSafetyValidator;
         this.codeGenerator = codeGenerator;
         this.analyticsService = analyticsService;
+        this.urlLookupCache = urlLookupCache;
     }
 
     @Transactional
@@ -52,7 +54,7 @@ public class UrlService {
 
     @Transactional(readOnly = true)
     public String resolve(String code) {
-        UrlMapping cached = findCachedForRedirect(code);
+        UrlMapping cached = urlLookupCache.findByCode(code);
         if (cached == null) {
             throw new NotFoundException("Unknown short code: " + code);
         }
@@ -76,11 +78,6 @@ public class UrlService {
         mapping.disable();
         repository.save(mapping);
         log.info("Disabled code={}", code);
-    }
-
-    @Cacheable(value = CacheConfig.URL_MAPPINGS_CACHE, key = "#code", unless = "#result == null")
-    public UrlMapping findCachedForRedirect(String code) {
-        return repository.findByCode(code).orElse(null);
     }
 
     private UrlMapping findOrThrow(String code) {
